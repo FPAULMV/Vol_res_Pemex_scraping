@@ -8,7 +8,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from selenium.webdriver.chrome.options import Options
 
-
 #  ------ Configuración de acceso y conexiona SQL Server ------ 
 server = '172.16.137.51'
 database = 'Sinergia_Aux'
@@ -21,7 +20,6 @@ conn = pyodbc.connect(conn_str)
 cursor = conn.cursor()
 # ------ Fin de configuracion del acceso al servidor ------ 
 
-
 # ------ Configuracion selenium ------ 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
@@ -33,8 +31,8 @@ driver = webdriver.Chrome(service=service, options=options)
 pagina_de_inicio = 'https://www.comercialrefinacion.pemex.com/portal/'
 pagina_volumen_restituido = 'https://www.comercialrefinacion.pemex.com/portal/sccli040/controlador?Destino=sccli040_01.jsp#'
 driver.get(pagina_de_inicio)
-usuario_Pmx = '0001500759'
-contrasena_pmx = 'ztgb9078'
+usuario_Pmx = '0000201611'
+contrasena_pmx = 'pz4126ke'
 driver.find_element(By.NAME,'usuario').send_keys(usuario_Pmx)
 driver.find_element(By.NAME,'contrasena').send_keys(contrasena_pmx)
 driver.find_element(By.NAME,'botonEntrar').send_keys(Keys.ENTER)
@@ -103,22 +101,16 @@ df['Destino'] = df['Destino'].astype(str)
 
 # Ahora, los nombres de las columnas en el DataFrame coinciden con los de la tabla SQL Server
 # Agregar datos a la tabla Volumen_Restituido en SQL Server
-tabla_destino = 'Volumen_Restituido'
+tabla_destino = 'Volumen_Restituido_Petro'
 for index, row in df.iterrows():
     # Construir la consulta de inserción
     query = f"INSERT INTO {tabla_destino} (Fecha_de_operacion, Permiso_CRE, Comprobante_de_carga, Remision, Producto, Volumen_comprobante_de_carga, Volumen_total_de_factura, Volumen_a_restituir, Cliente, Destino) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     # Ejecutar la consulta con los valores de la fila actual
     cursor.execute(query, tuple(row))
 
-query_2 = ("UPDATE Volumen_Restituido SET CodigoInstalacion = LEFT(Destino, CHARINDEX('-', Destino) - 1);")
-
-cursor.execute(query_2)
-
 # ------ Elimina los registros duplicados (Si existen) ------ 
 
 query_3 = ("with C as (select  id, comprobante_de_carga, Remision, ROW_NUMBER() over (PARTITION BY comprobante_de_carga ORDER BY comprobante_de_carga desc) AS DUPLICADO FROM Volumen_Restituido) DELETE FROM C WHERE DUPLICADO >1")
-
-print(query_3)
 
 cursor.execute(query_3)
 
