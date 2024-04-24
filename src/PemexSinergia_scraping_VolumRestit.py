@@ -6,23 +6,18 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
-from selenium.webdriver.chrome.options import Options
+from decouple import config
 
 #  ------ Configuración de acceso y conexiona SQL Server ------ 
-server = '172.16.137.51'
-database = 'Sinergia_Aux'
-username = 'nf2'
-password = 'nf@qwe'
-driver = 'ODBC Driver 17 for SQL Server'
-
-conn_str = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}'
+conn_str = f'DRIVER={config('driver')};SERVER={config('server')};DATABASE={config('database')};UID={config('username')};PWD={config('password')}'
+print(str(conn_str))
 conn = pyodbc.connect(conn_str)
 cursor = conn.cursor()
 # ------ Fin de configuracion del acceso al servidor ------ 
 
 # ------ Configuracion selenium ------ 
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")
+# options.add_argument("--headless")
 service = ChromeService(executable_path="C:/Program Files/Google/Chrome/Application/chromedriver.exe")
 driver = webdriver.Chrome(service=service, options=options)
 # ------ Fin de configuracion selenium ------ 
@@ -31,10 +26,8 @@ driver = webdriver.Chrome(service=service, options=options)
 pagina_de_inicio = 'https://www.comercialrefinacion.pemex.com/portal/'
 pagina_volumen_restituido = 'https://www.comercialrefinacion.pemex.com/portal/sccli040/controlador?Destino=sccli040_01.jsp#'
 driver.get(pagina_de_inicio)
-usuario_Pmx = '0000201611'
-contrasena_pmx = 'pz4126ke'
-driver.find_element(By.NAME,'usuario').send_keys(usuario_Pmx)
-driver.find_element(By.NAME,'contrasena').send_keys(contrasena_pmx)
+driver.find_element(By.NAME,'usuario').send_keys(config('usuario_Pmx'))
+driver.find_element(By.NAME,'contrasena').send_keys(config('contrasena_pmx'))
 driver.find_element(By.NAME,'botonEntrar').send_keys(Keys.ENTER)
         
         #------ En este momento ya hicimos login en la pagina ------ 
