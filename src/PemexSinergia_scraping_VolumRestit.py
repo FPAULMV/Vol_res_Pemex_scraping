@@ -27,10 +27,11 @@ cursor.execute("""
     """)
 resultado = cursor.fetchone()
 fecha_inicial = date(resultado.Year, resultado.Month, resultado.Day)
+print(fecha_inicial)
 fecha_final = date.today() - timedelta(days=1)
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
-service = ChromeService(executable_path="C:/Program Files/Google/Chrome/Application/chromedriver.exe")
+service = ChromeService(executable_path="Util/chromedriver.exe")
 driver = webdriver.Chrome(service=service, options=options)
 def verificar_elemento():
     if driver.find_elements(By.XPATH, "//b[text()='No se encontró información']"):
